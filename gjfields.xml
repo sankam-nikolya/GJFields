@@ -3,12 +3,12 @@
   <name>GJFields - a set of additional JForm feilds</name>
   <libraryname>gjfields</libraryname>
   <author>Gruz</author>
-  <creationDate>2015-08-06</creationDate>
+  <creationDate>2015-08-07</creationDate>
   <copyright>Copyright (C) 2011</copyright>
   <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
   <authorEmail>arygroup@gmail.com</authorEmail>
   <authorUrl>www.gruz.org.ua</authorUrl>
-  <version>1.0.67</version>
+  <version>1.0.68</version>
   <description>Provides a set of additional JForm fileds. I.e. Variablefield is a self-reproducing JFrom field, which supports variable fields and groups of fields. Alas, no nested groups allowed. </description>
   <files>
     <folder>css</folder>
@@ -16,7 +16,7 @@
     <folder>images</folder>
     <folder>js</folder>
     <folder>language</folder>
-    <filename>README</filename>
+    <filename>README.md</filename>
     <filename>article.php</filename>
     <filename>blockquote.php</filename>
     <filename>gjfields.php</filename>
