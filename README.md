@@ -4,4 +4,3 @@ Provides a set of additiona JForm fileds. I.e. Variablefield is a self-reproduci
 
 *See for more information:* http://gruz.org.ua/about-joomla/29-joomla-extensions/34-joomla-self-reproducing-jfrom-field.html
 
-a
