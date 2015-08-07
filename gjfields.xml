@@ -8,7 +8,7 @@
   <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
   <authorEmail>arygroup@gmail.com</authorEmail>
   <authorUrl>www.gruz.org.ua</authorUrl>
-  <version>1.0.86</version>
+  <version>1.0.87</version>
   <description>Provides a set of additional JForm fileds. I.e. Variablefield is a self-reproducing JFrom field, which supports variable fields and groups of fields. Alas, no nested groups allowed. </description>
   <files>
     <folder>css</folder>
