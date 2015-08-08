@@ -91,7 +91,7 @@ class JFormFieldModalArticle extends JFormFieldGJFields
 			//$title = JText::_('COM_CONTENT_SELECT_AN_ARTICLE');
 		}
 		$title = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
-dump($this->value,'$this->value');
+
 		if (is_array($this->value)) {
 			foreach ($this->value as $k=>$v) {
 				if (empty($v) || $v === "") {
