@@ -34,17 +34,22 @@ class JFormFieldTextareafixed extends JFormFieldGJFields	{
 		// Initialize some field attributes.
 		$class		= $this->element['class'] ? ' class="'.(string) $this->element['class'].'"' : '';
 		$disabled	= ((string) $this->element['disabled'] == 'true') ? ' disabled="disabled"' : '';
-		$columns	= $this->element['cols'] ? ' cols="'.(int) $this->element['cols'].'"' : '';
+		$columns	= $this->element['cols'] ? ' cols="'.(int) $this->element['cols'].'" style="width:inherit;"' : '';
 		$rows		= $this->element['rows'] ? ' rows="'.(int) $this->element['rows'].'"' : '';
 
 		// Initialize JavaScript field attributes.
 		$onchange	= $this->element['onchange'] ? ' onchange="'.(string) $this->element['onchange'].'"' : '';
 
+		// Used for testing default
+		//~ if (empty($this->value )) {
+			//~ $this->value = $this->element['default'];
+		//~ }
+		$this->element['default'] = JText::_($this->element['default']).$this->Addition('default');
+
 		if ($this->element['default'] == $this->value ) {
 			$this->value = JText::_($this->value);
 			$this->value = str_replace('\n',PHP_EOL,$this->value);
 		}
-
 		return '<textarea name="'.$this->name.'" id="'.$this->id.'"' .
 				$columns.$rows.$class.$disabled.$onchange.'>' .
 				htmlspecialchars($this->value, ENT_COMPAT, 'UTF-8') .
@@ -61,8 +66,30 @@ class JFormFieldTextareafixed extends JFormFieldGJFields	{
 		// Get the label text from the XML element, defaulting to the element name.
 		$text = $this->element['label'] ? (string) $this->element['label'] : (string) $this->element['name'];
 		$text = $this->translateLabel ? JText::_($text) : $text;
-		if (isset($this->element['labelAddition']) && !empty($this->element['labelAddition'])) {
-			$addition = explode(';$',$this->element['labelAddition']);
+
+		$text .= $this->Addition('label');
+
+		// Forcing the Alias field to display the tip below
+		$position = $this->element['name'] == 'alias' ? ' data-placement="bottom" ' : '';
+
+		$description = ($this->translateDescription && !empty($this->description)) ? JText::_($this->description) : $this->description;
+
+		$displayData = array(
+				'text'        => $text,
+				'description' => $description,
+				'for'         => $this->id,
+				'required'    => (bool) $this->required,
+				'classes'     => explode(' ', $this->labelclass),
+				'position'    => $position
+			);
+
+		return JLayoutHelper::render($this->renderLabelLayout, $displayData);
+	}
+
+	function Addition ($fieldNameCore) {
+		$text = '';
+		if (isset($this->element[$fieldNameCore.'Addition']) && !empty($this->element[$fieldNameCore.'Addition'])) {
+			$addition = explode(';$',$this->element[$fieldNameCore.'Addition']);
 			if (!file_exists(JPATH_SITE.'/'.$addition[0])) {
 				JFactory::getApplication()->enqueueMessage(JText::_('LIB_GJFIELDS_LABELADDITION_FILE_DOES_NOT_EXISTS').' : '.$addition[0].'<br/>'.$this->element['label'].' : '.$this->element['name'], 'error');
 			}
@@ -82,21 +109,7 @@ class JFormFieldTextareafixed extends JFormFieldGJFields	{
 				}
 			}
 		}
-		// Forcing the Alias field to display the tip below
-		$position = $this->element['name'] == 'alias' ? ' data-placement="bottom" ' : '';
-
-		$description = ($this->translateDescription && !empty($this->description)) ? JText::_($this->description) : $this->description;
-
-		$displayData = array(
-				'text'        => $text,
-				'description' => $description,
-				'for'         => $this->id,
-				'required'    => (bool) $this->required,
-				'classes'     => explode(' ', $this->labelclass),
-				'position'    => $position
-			);
-
-		return JLayoutHelper::render($this->renderLabelLayout, $displayData);
+		return $text;
 	}
 }
 
