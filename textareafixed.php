@@ -50,5 +50,53 @@ class JFormFieldTextareafixed extends JFormFieldGJFields	{
 				htmlspecialchars($this->value, ENT_COMPAT, 'UTF-8') .
 				'</textarea>';
 	}
+
+	public function getLabel()
+	{
+		if ($this->hidden)
+		{
+			return '';
+		}
+
+		// Get the label text from the XML element, defaulting to the element name.
+		$text = $this->element['label'] ? (string) $this->element['label'] : (string) $this->element['name'];
+		$text = $this->translateLabel ? JText::_($text) : $text;
+		if (isset($this->element['labelAddition']) && !empty($this->element['labelAddition'])) {
+			$addition = explode(';$',$this->element['labelAddition']);
+			if (!file_exists(JPATH_SITE.'/'.$addition[0])) {
+				JFactory::getApplication()->enqueueMessage(JText::_('LIB_GJFIELDS_LABELADDITION_FILE_DOES_NOT_EXISTS').' : '.$addition[0].'<br/>'.$this->element['label'].' : '.$this->element['name'], 'error');
+			}
+			else {
+				require JPATH_SITE.'/'.$addition[0];
+				if (!isset($$addition[1])) {
+					JFactory::getApplication()->enqueueMessage(JText::_('LIB_GJFIELDS_LABELADDITION_VARIABLE_DOES_NOT_EXISTS').' : '.$addition[1].'<br/>'.$this->element['label'].' : '.$this->element['name'], 'error');
+				}
+				else {
+					$additionVar = $$addition[1];
+					if (!is_array($additionVar)) {
+						$text .= '<br/><b>'.$additionVar.'</b>';
+					}
+					else {
+						$text .= '<br/><b>'.implode('</b><br><b>',$additionVar).'</b>';
+					}
+				}
+			}
+		}
+		// Forcing the Alias field to display the tip below
+		$position = $this->element['name'] == 'alias' ? ' data-placement="bottom" ' : '';
+
+		$description = ($this->translateDescription && !empty($this->description)) ? JText::_($this->description) : $this->description;
+
+		$displayData = array(
+				'text'        => $text,
+				'description' => $description,
+				'for'         => $this->id,
+				'required'    => (bool) $this->required,
+				'classes'     => explode(' ', $this->labelclass),
+				'position'    => $position
+			);
+
+		return JLayoutHelper::render($this->renderLabelLayout, $displayData);
+	}
 }
 

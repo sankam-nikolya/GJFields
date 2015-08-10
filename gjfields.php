@@ -46,6 +46,7 @@ class JFormFieldGJFields extends JFormField {
 			}
 		}
 	}
+
 	function getInput() {
 	}
 	function def( $val, $default = '' )	{

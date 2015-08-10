@@ -125,4 +125,27 @@ class JFormFieldModalArticle extends JFormFieldGJFields
 
 		return implode("\n", $html);
 	}
+		/**
+	 * Method to get the filtering groups (null means no filtering)
+	 *
+	 * @return  mixed  array of filtering groups or null.
+	 *
+	 * @since   1.6.0
+	 */
+	protected function getGroups()
+	{
+		return null;
+	}
+
+	/**
+	 * Method to get the users to exclude from the list of users
+	 *
+	 * @return  mixed  Array of users to exclude or null to to not exclude them
+	 *
+	 * @since   1.6.0
+	 */
+	protected function getExcluded()
+	{
+		return null;
+	}
 }
