@@ -74,10 +74,10 @@ class JFormFieldTextareafixed extends JFormFieldGJFields	{
 				else {
 					$additionVar = $$addition[1];
 					if (!is_array($additionVar)) {
-						$text .= '<br/><b>'.$additionVar.'</b>';
+						$text .= $additionVar;
 					}
 					else {
-						$text .= '<br/><b>'.implode('</b><br><b>',$additionVar).'</b>';
+						$text .= implode('',$additionVar);
 					}
 				}
 			}
