@@ -40,11 +40,11 @@ class JFormFieldTextareafixed extends JFormFieldGJFields	{
 		// Initialize JavaScript field attributes.
 		$onchange	= $this->element['onchange'] ? ' onchange="'.(string) $this->element['onchange'].'"' : '';
 
-		// Used for testing default
-		//~ if (empty($this->value )) {
-			//~ $this->value = $this->element['default'];
-		//~ }
 		$this->element['default'] = JText::_($this->element['default']).$this->Addition('default');
+		// Used for testing default
+		if (empty($this->value )) {
+			$this->value = $this->element['default'];
+		}
 
 		if ($this->element['default'] == $this->value ) {
 			$this->value = JText::_($this->value);
