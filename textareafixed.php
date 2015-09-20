@@ -45,8 +45,8 @@ class JFormFieldTextareafixed extends JFormFieldGJFields	{
 		//~ if (empty($this->value )) {
 			//~ $this->value = $this->element['default'];
 		//~ }
-
-		if ($this->element['default'] == $this->value ) {
+		if ($this->value == '') { $this->value = (string)$this->element['default'] ;}
+		if ((string)$this->element['default'] == $this->value || (string)$this->element['default'] == JText::_($this->value)) {
 			$this->value = JText::_($this->value);
 			$this->value = str_replace('\n',PHP_EOL,$this->value);
 		}
