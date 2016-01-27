@@ -255,6 +255,24 @@ class JFormFieldVariablefield extends JFormFieldGJFields
 		if(version_compare(JVERSION,'3.0','ge')) {
 			$output .=  '</div><!-- controls OR my empty div !-->'.$this->blockElementStartHTML(true,$ruleUniqID);
 			$output .= PHP_EOL.'<div class="sliderContainer">'.PHP_EOL;
+
+			//Let show the script, that the group has ended
+			$formfield = JFormHelper::loadFieldType('text');
+			$formfield->setup($this->element,'');
+			$formfield->id = '';
+			$formfield->disabled = 'disabled';
+			$formfield->class = 'ruleUniqID';
+			$formfield->name = 'jform[params]['.$this->fieldname.'][__ruleUniqID][]';// Remake field name to use group name
+			$formfield->value = !empty($ruleUniqID)?$ruleUniqID:'';
+			$output.= '<span class="ruleUniqID">UniqID: '.$formfield->getInput().'</span>'.PHP_EOL;
+
+			//Let show the script, that the group has ended
+			$formfield = JFormHelper::loadFieldType('hidden');
+			$formfield->setup($this->element,'');
+			$formfield->id = '';
+			$formfield->name = 'jform[params]['.$this->fieldname.'][__ruleUniqID][]';// Remake field name to use group name
+			$formfield->value = 'variablefield::'.$this->fieldname;
+			$output.= $formfield->getInput().PHP_EOL;
 		}
 		else {
 			$output .= PHP_EOL.'</li></ul>'.PHP_EOL;
@@ -332,7 +350,8 @@ class JFormFieldVariablefield extends JFormFieldGJFields
 			$formfield->readonly = 'true';// Need to set class like this in J3.2+
 
 
-			$output .= '<span class="hdr-wrppr">'.$formfield->getInput().'</span>'.PHP_EOL;
+			JHTML::_('behavior.tooltip');
+			$output .= '<span class="hdr-wrppr hasTip" title="'.JText::_('LIB_VARIABLEFILED_GROUPNAME_TIP').'">'.$formfield->getInput().'</span>'.PHP_EOL;
 			$output .= '</div><!-- buttons_container -->' ;
 
 			//Field to store group status - opened or closed
@@ -355,25 +374,6 @@ class JFormFieldVariablefield extends JFormFieldGJFields
 			$formfield->name = 'jform[params]['.$this->fieldname.']['.(string)$this->fieldname.'][]';// Remake field name to use group name
 			$formfield->value = 'variablefield::'.$this->fieldname;
 			$output .= $formfield->getInput().PHP_EOL;
-
-			//Let show the script, that the group has ended
-			$formfield = JFormHelper::loadFieldType('hidden');
-			$formfield->setup($this->element,'');
-			$formfield->id = '';
-			$formfield->class = 'ruleUniqID';
-			$formfield->name = 'jform[params]['.$this->fieldname.'][__ruleUniqID][]';// Remake field name to use group name
-			$formfield->value = !empty($ruleUniqID)?$ruleUniqID:'';
-			$output.= $formfield->getInput().PHP_EOL;
-
-			//Let show the script, that the group has ended
-			$formfield = JFormHelper::loadFieldType('hidden');
-			$formfield->setup($this->element,'');
-			$formfield->id = '';
-			$formfield->name = 'jform[params]['.$this->fieldname.'][__ruleUniqID][]';// Remake field name to use group name
-			$formfield->value = 'variablefield::'.$this->fieldname;
-			$output.= $formfield->getInput().PHP_EOL;
-
-
 		}
 		else {
 			$output .= '<div class="variablefield_div repeating_element" >'.'<div class="buttons_container">'.$buttons.'</div><!-- buttons_container -->' ;
