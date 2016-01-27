@@ -121,6 +121,24 @@ if (typeof( window['gjVariablefield'] ) == "undefined") {
 
 			var newPanel = currPanel.clone(true);
 
+			jQuery(newPanel).find('.ruleUniqID')[0].value = this.uniqid(); // Make uniqId for a group
+
+			// Add smth. like (2) to the name of the group when copying
+			var groupNameValue = jQuery(newPanel).find('.groupnameEditField')[0].value;
+			var i = 2;
+			while (true) {
+				var unique = true;
+				jQuery('.groupnameEditField').each(function() {//iterate all toBeToggled blocks and find switches
+
+					if (groupNameValue+' ('+i+')' == this.value) {
+						unique = false;
+					}
+				});
+				if (unique) { break; }
+				i = i+1;
+			}
+			jQuery(newPanel).find('.groupnameEditField')[0].value = jQuery(newPanel).find('.groupnameEditField')[0].value + ' ('+i+')';
+
 			if (newPanel.hasClass('repeating_group')) { //If we are copying  a group
 				gjScripts.moveElementOneNodeUp(newPanel.getElements('.sliderContainer')[0]); // Prepare to init slider at the new panel
 			}
@@ -130,7 +148,6 @@ if (typeof( window['gjVariablefield'] ) == "undefined") {
 				jQuery(newPanel).find('.chzn-done').removeClass("chzn-done").addClass("chzn-select");
 				jQuery(".chzn-select").chosen();
 			}
-
 			if (newPanel.hasClass('repeating_group')) {
 				this.initSlider(newPanel.getChildren('.buttons_container')[0].getChildren('label.groupSlider')[0]);
 
@@ -196,8 +213,14 @@ if (typeof( window['gjVariablefield'] ) == "undefined") {
 		removeClass: function (ele,cls) {
 			var reg = new RegExp('(\\s|^)'+cls+'(\\s|$)');
 			ele.className=ele.className.replace(reg,' ');
+		},
+		uniqid: function () {
+			 var ts=String(new Date().getTime()), i = 0, out = '';
+			 for(i=0;i<ts.length;i+=2) {
+				 out+=Number(ts.substr(i, 2)).toString(36);
+			 }
+			 return ('d'+out);
 		}
 	});
-
 
 }

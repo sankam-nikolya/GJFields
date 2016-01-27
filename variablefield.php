@@ -149,7 +149,8 @@ class JFormFieldVariablefield extends JFormFieldGJFields
 					case 'start':
 						$field->group_header = isset($current_values[$i][(string)$field->fieldname][0])?$current_values[$i][(string)$field->fieldname][0]:'';
 						$field->open = isset($current_values[$i][(string)$field->fieldname][1])?$current_values[$i][(string)$field->fieldname][1]:'1';
-						$output .= $field->groupStartHTML();
+						$ruleUniqID = !empty($current_values[$i]['__ruleUniqID'][0])?$current_values[$i]['__ruleUniqID'][0]:uniqid();
+						$output .= $field->groupStartHTML($ruleUniqID);
 						break;
 					case 'end':
 						$output .= $field->groupEndHTML();
@@ -249,15 +250,15 @@ class JFormFieldVariablefield extends JFormFieldGJFields
 		}
 	}
 
-	function groupStartHTML() {
+	function groupStartHTML($ruleUniqID='') {
 		$output = '';
 		if(version_compare(JVERSION,'3.0','ge')) {
-			$output .=  '</div><!-- controls OR my empty div !-->'.$this->blockElementStartHTML(true);
+			$output .=  '</div><!-- controls OR my empty div !-->'.$this->blockElementStartHTML(true,$ruleUniqID);
 			$output .= PHP_EOL.'<div class="sliderContainer">'.PHP_EOL;
 		}
 		else {
 			$output .= PHP_EOL.'</li></ul>'.PHP_EOL;
-			$output .=  $this->blockElementStartHTML(true);
+			$output .=  $this->blockElementStartHTML(true,$ruleUniqID);
 			$output .= PHP_EOL.'<div class="sliderContainer"><ul class="adminformlist"><li>'.PHP_EOL;
 		}
 		return $output;
@@ -276,7 +277,7 @@ class JFormFieldVariablefield extends JFormFieldGJFields
 		return $output;
 	}
 
-	function blockElementStartHTML($isGroup = false) {
+	function blockElementStartHTML($isGroup = false,$ruleUniqID = '') {
 		$output = '';
 		$maxRepeatLength	= isset($this->element['maxrepeatlength']) ? (int) $this->element['maxrepeatlength']: 0;
 
@@ -355,6 +356,24 @@ class JFormFieldVariablefield extends JFormFieldGJFields
 			$formfield->value = 'variablefield::'.$this->fieldname;
 			$output .= $formfield->getInput().PHP_EOL;
 
+			//Let show the script, that the group has ended
+			$formfield = JFormHelper::loadFieldType('hidden');
+			$formfield->setup($this->element,'');
+			$formfield->id = '';
+			$formfield->class = 'ruleUniqID';
+			$formfield->name = 'jform[params]['.$this->fieldname.'][__ruleUniqID][]';// Remake field name to use group name
+			$formfield->value = !empty($ruleUniqID)?$ruleUniqID:'';
+			$output.= $formfield->getInput().PHP_EOL;
+
+			//Let show the script, that the group has ended
+			$formfield = JFormHelper::loadFieldType('hidden');
+			$formfield->setup($this->element,'');
+			$formfield->id = '';
+			$formfield->name = 'jform[params]['.$this->fieldname.'][__ruleUniqID][]';// Remake field name to use group name
+			$formfield->value = 'variablefield::'.$this->fieldname;
+			$output.= $formfield->getInput().PHP_EOL;
+
+
 		}
 		else {
 			$output .= '<div class="variablefield_div repeating_element" >'.'<div class="buttons_container">'.$buttons.'</div><!-- buttons_container -->' ;
@@ -362,7 +381,6 @@ class JFormFieldVariablefield extends JFormFieldGJFields
 
 
 		return $output;
-		return $output.'<span class="cleaner"></span>';
 	}
 	function blockElementEndHTML() {
 		$output = '';

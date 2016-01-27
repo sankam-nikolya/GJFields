@@ -18,7 +18,7 @@ class JFormFieldGJFields extends JFormField {
 		JHTML::_('behavior.framework', true);
 		if (!isset($GLOBALS[$this->type.'_initialized'])) {
 			$GLOBALS[$this->type.'_initialized'] = true;
-			$url_to_assets = JURI::root().'libraries/gjfields/';
+			$url_to_assets = '/libraries/gjfields/';
 			$path_to_assets = JPATH_ROOT.'/libraries/gjfields/';
 			$doc = JFactory::getDocument();
 
@@ -39,7 +39,7 @@ class JFormFieldGJFields extends JFormField {
 			$common_script = $url_to_assets.'js/script.js?v='.$jversion->RELEASE;
 			$doc->addScript($common_script);
 
-			$scriptname = $url_to_assets.'js/'.$this->type.'.js';
+			$scriptname = $url_to_assets.'js/'.$this->type.'.js?v='.$this->_getGJFieldsVersion();
 			$scriptname_path = $path_to_assets.'js/'.$this->type.'.js';
 			if (file_exists($scriptname_path)) {
 				$doc->addScript($scriptname);
@@ -51,6 +51,13 @@ class JFormFieldGJFields extends JFormField {
 	}
 	function def( $val, $default = '' )	{
 		return ( isset( $this->element[$val] ) && (string) $this->element[$val] != '' ) ? (string) $this->element[$val] : $default;
+	}
+
+	private function _getGJFieldsVersion () {
+		$gjfields_version = file_get_contents(dirname(__FILE__).'/gjfields.xml');
+		preg_match('~<version>(.*)</version>~Ui',$gjfields_version,$gjfields_version);
+		$gjfields_version = $gjfields_version[1];
+		return $gjfields_version;
 	}
 
 }
