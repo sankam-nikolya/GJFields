@@ -260,7 +260,7 @@ class JFormFieldVariablefield extends JFormFieldGJFields
 			$formfield = JFormHelper::loadFieldType('text');
 			$formfield->setup($this->element,'');
 			$formfield->id = '';
-			$formfield->disabled = 'disabled';
+			$formfield->readonly = 'readonly';
 			$formfield->class = 'ruleUniqID';
 			$formfield->name = 'jform[params]['.$this->fieldname.'][__ruleUniqID][]';// Remake field name to use group name
 			$formfield->value = !empty($ruleUniqID)?$ruleUniqID:'';

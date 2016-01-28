@@ -70,7 +70,6 @@ class JPluginGJFields extends JPlugin {
 			$params->{$group_name} = array();
 		}
 		$pparams_temp  = $params->{$group_name};
-
 		foreach ($pparams_temp as $fieldname=>$values) {
 			$group_number = 0;
 			$values = (array) $values;
