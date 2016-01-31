@@ -121,7 +121,7 @@ if (typeof( window['gjVariablefield'] ) == "undefined") {
 
 			var newPanel = currPanel.clone(true);
 
-			jQuery(newPanel).find('.ruleUniqID')[0].value = this.uniqid(); // Make uniqId for a group
+			jQuery(newPanel).find('input.ruleUniqID')[0].value = this.uniqid(); // Make uniqId for a group
 
 			// Add smth. like (2) to the name of the group when copying
 			var groupNameValue = jQuery(newPanel).find('.groupnameEditField')[0].value;
