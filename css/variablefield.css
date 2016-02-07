@@ -119,8 +119,7 @@ input[readonly="readonly"],input:focus[readonly="readonly"],input.readonlyGroupN
     background:silver;
     color:#000;
 }
-#general  span.ruleUniqID,
-#general  span.ruleUniqID input {
+.control-group span.ruleUniqID, .control-group span.ruleUniqID input {
 	padding:0;
 	margin:0;
 	border:0px solid;
