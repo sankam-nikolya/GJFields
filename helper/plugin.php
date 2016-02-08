@@ -35,6 +35,58 @@ class JPluginGJFields extends JPlugin {
 
 
 	/**
+	 * Determines if the current plugin has been just saved or applied and stores result into $this->pluginHasBeenSavedOrApplied
+	 *
+	 * The call of the function must be placed into __construct  or at least onAfterRoute.
+	 * When saving a plugin Joomla uses a redirect. So onAfterRoute (and surely __construct) is run twice,
+	 * while onAfterRender and futher functions only once (..onAfterRoute - redirect - ..onAfterRoute->onAfterRender)
+	 * At the first onAfterRoute I can get such variables as task and jform to determine what action is performed.
+	 * At the secon onAfterRoute the variables are empty, as they have been used before the redirect.
+	 * So I check the needed variables to determin if the plugin is saved and enabled before the redirect onAfterRoute and store
+	 * some flags to the session.
+	 * After the redirect I get the flags from the session, clear the session not to run the plugin twice and run the main function body.
+	 *
+	 * @author Gruz <arygroup@gmail.com>
+	 * @param	type	$name	Description
+	 * @return	type			Description
+	 */
+	protected function _preparePluginHasBeenSavedOrAppliedFlag () {
+		$jinput = JFactory::getApplication()->input;
+		if ($jinput->get('option',null) == 'com_dump') { return; }
+
+		//CHECK IF THE PLUGIN WAS JUST SAVED AND STORE A FLAG TO SESSION
+		$jinput = JFactory::getApplication()->input;
+		$this->pluginHasBeenSavedOrApplied = false;
+
+		$session = JFactory::getSession();
+		$option = $jinput->get('option',null);
+		$task = $jinput->get('task',null);
+		if ($option == 'com_plugins' && in_array ($task,array('plugin.save','plugin.apply'))) {
+			// If the plugin which is saved is our current plugin and it's enabled
+			$session = JFactory::getSession();
+			$jform = $jinput->post->get('jform',null,'array');
+			if(isset($jform['element']) && $jform['element'] == $this->plg_name && isset($jform['folder']) && $jform['folder'] == $this->plg_type) {
+				if ($jform['enabled'] == '0') {
+					//unset ($_SESSION[$this->plg_full_name]);
+					$session->clear($this->plg_full_name);
+				}
+				else {
+					$data = new stdClass;
+					$data->runPlugin = true;
+					$session->set($this->plg_full_name, $data);
+				}
+			}
+		}
+		else {
+			$sessionInfo = $session->get($this->plg_full_name,array());
+			$session->clear($this->plg_full_name);
+			if (empty($sessionInfo) || empty($sessionInfo->runPlugin)) {	return; } // If we do not have to run plugin - joomla is not saving the plugin
+			else {$this->pluginHasBeenSavedOrApplied = $sessionInfo->runPlugin; }
+		}
+	}
+
+
+	/**
 	 * Parses parameters of gjfileds (variablefileds) into a convinient arrays
 	 *
 	 * @author Gruz <arygroup@gmail.com>
@@ -112,27 +164,22 @@ class JPluginGJFields extends JPlugin {
 	 * <code>$this->paramGet( 'some_field_name',[optional 'default_value'])</code>
 	 *
 	 * @author Gruz <arygroup@gmail.com>
-	 * @param type $name Description
-	 * @return type Description
+	 * @param string $name XML field name
+	 * @param mixed $default Default value if not default is found
+	 * @return mixed default value
 	 */
 	function paramGet($name,$default=null) {
 		$hash = get_class();
 		$session = JFactory::getSession();
-		$params = $session->get('DefaultParams',false,$hash);
-		if (empty($params)) {
+		$params = $session->get('DefaultParams',false,$hash); // Get cached parameteres
+		if (empty($params) || empty($params[$name])) {
 			//$xmlfile = dirname(__FILE__).'/'.basename(__FILE__,'.php').'.xml';
 			$xmlfile = $this->plg_path.'/'.$this->plg_name.'.xml';
 			$xml = simplexml_load_file($xmlfile);
-			if ( version_compare( JVERSION, '1.6.0', 'ge' ) ) {
-				unset ($xml->scriptfile);
-				$field = 'field';
-				$xpath = 'config/fields/fieldset';
-			}
-			else {
-				$field = 'param';
-				$xpath = 'params';
+			//unset ($xml->scriptfile);
+			$field = 'field';
+			$xpath = 'config/fields/fieldset';
 
-			}
 			foreach ($xml->xpath('//'.$xpath.'/'.$field) as $f) {
 				if (isset($f['default']) ) {
 					if (preg_match('~[0-9]+,[0-9]*~',(string)$f['default'])) {
@@ -151,5 +198,48 @@ class JPluginGJFields extends JPlugin {
 		return $this->params->get( $name,$params[$name]);
 	}
 
+
+	/**
+	 * Checks if current view is a plugin edit view
+	 *
+	 * @author Gruz <arygroup@gmail.com>
+	 * @return	bool			true if currentrly editing current plugin, false - if another plugin view
+	 */
+
+	function checkIfNowIsCurrentPluginEditWindow() {
+		$jinput = JFactory::getApplication()->input;
+
+		$option = $jinput->get('option',null);
+		if ($option !== 'com_plugins') { return false; }
+		$view = $jinput->get('view',null);
+		$layout = $jinput->get('layout',null);
+		$current_extension_id = $jinput->get('extension_id',null);
+		if ($view == 'plugin' && $layout == 'edit') { // Means we are editing a plugin
+			$db = JFactory::getDBO();
+			$db->setQuery('SELECT extension_id FROM #__extensions WHERE type ='.$db->quote('plugin'). ' AND element = '. $db->quote($this->plg_name).' AND folder = '.$db->quote($this->plg_type));
+			$extension_id = $db->loadResult();
+			if ($current_extension_id == $extension_id) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	function checkIfAPluginPublished ($plugin_group,$plugin_name, $show_message = true) {
+		$plugin_state = JPluginHelper::getPlugin($plugin_group, $plugin_name);
+
+		if (!$plugin_state) {
+			if ($show_message) {
+				$db = JFactory::getDBO();
+				$db->setQuery('SELECT name FROM #__extensions WHERE type ='.$db->quote('plugin'). ' AND element = '. $db->quote($plugin_name).' AND folder = '.$db->quote($plugin_group));
+				$name = $db->loadResult();
+				$plugin_name = JText::_($name);
+				$application = JFactory::getApplication();
+				$application->enqueueMessage(JText::sprintf('LIB_GJFIELDS_PLUGIN_NOT_PUBLISHED',$plugin_name,$plugin_group,$plugin_name,$plugin_name,$plugin_group), 'error');
+			}
+			return false;
+		}
+		else {return true;}
+	}
 
 }
