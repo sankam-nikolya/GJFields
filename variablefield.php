@@ -84,18 +84,24 @@ class JFormFieldVariablefield extends JFormFieldGJFields
 		}
 
 	}
-	protected function getLabel() {
+	protected function getLabel($flag = false) {
 $debug = true;
 $debug = false;
 		// Here I handle dependant load of categories
 		static $count = array();
 		static $from_params = null;
 		static $defaults = array();
+		//~ static $runNumber = 0;
+		//~ $runNumber++;
 
-		if (isset($this->element['source_parameter']) && isset($this->element['target_parameter'])) {
+		if (isset($this->element['source_parameter']) && isset($this->element['target_parameter']) && $flag) {
+			$this_field_name = $this->name;
+if($debug) dumpMessage($this_field_name);
+if($debug) dumpTrace();
 			if (empty($from_params)) {
 				$key_in_params = (string)$GLOBALS['variablefield']['fields'][0]->element['name'];
 				$from_params = $GLOBALS['variablefield']['fields'][0]->form->getData()->toObject()->params->{$key_in_params};
+if($debug) dump ($from_params,'$from_params');
 				foreach ($GLOBALS['variablefield']['fields'] as $k=>$v) {
 					$default = $v->getAttribute('default');
 					if (!empty($default)) {
@@ -105,8 +111,9 @@ $debug = false;
 					}
 				}
 			}
-			$this_field_name = $this->getAttribute('name');
+if($debug) dump ($this,'$this');
 if($debug) dumpMessage($this_field_name);
+
 			if (!isset($count[$this_field_name])) {
 				$count[$this_field_name] = 0;
 			} else {
@@ -143,7 +150,7 @@ if($debug) dump ($values,'$values 2');
 					$this->element[$target_parameters[$k]] = implode(',',$values[$index]);
 				}
 				else {
-if($debug) dump ($values[$index], ' ++ '.$target_parameters[$k]);
+if($debug) dumpMessage (' Setting <b>'.$target_parameters[$k] . '</b> to  <b>'. $values[$index].'</b>');
 					$this->element[$target_parameters[$k]] = $values[$index];
 				}
 			}
@@ -223,11 +230,12 @@ if($debug) dump ($values[$index], ' ++ '.$target_parameters[$k]);
 					default :
 //break;
 						$field->name = 'jform[params]['.$current_group.']['.(string)$field->fieldname.']';// Перевормували навзу поля, щоби вона враховувала групу
+
 						$field->value = isset($current_values[$i][(string)$field->fieldname])?$current_values[$i][(string)$field->fieldname]:$field->defaultvalue;
 
 						if(version_compare(JVERSION,'3.0','ge')) {
 							$output .= PHP_EOL.'<div class="control-group">'.PHP_EOL;
-							$output .= PHP_EOL.'<div class="control-label">'.PHP_EOL.$field->getLabel().PHP_EOL.'</div><!-- control-label of a variable field -->'.PHP_EOL;
+							$output .= PHP_EOL.'<div class="control-label">'.PHP_EOL.$field->getLabel(true).PHP_EOL.'</div><!-- control-label of a variable field -->'.PHP_EOL;
 							$output .= PHP_EOL.'<div class="controls">'.PHP_EOL.$field->getInputHelper().PHP_EOL.'</div><!-- controls of a variable field -->'.PHP_EOL;
 							$output .= PHP_EOL.'</div><!-- control-group -->';
 						}
@@ -266,7 +274,6 @@ if($debug) dump ($values[$index], ' ++ '.$target_parameters[$k]);
 	}
 
 	protected function getInputHelper () {
-
 
 		switch ((string)$this->element['basetype']) {
 			case 'radio':
