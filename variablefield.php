@@ -90,13 +90,22 @@ $debug = false;
 		// Here I handle dependant load of categories
 		static $count = array();
 		static $from_params = null;
+		static $defaults = array();
 
 		if (isset($this->element['source_parameter']) && isset($this->element['target_parameter'])) {
 			if (empty($from_params)) {
 				$key_in_params = (string)$GLOBALS['variablefield']['fields'][0]->element['name'];
 				$from_params = $GLOBALS['variablefield']['fields'][0]->form->getData()->toObject()->params->{$key_in_params};
+				foreach ($GLOBALS['variablefield']['fields'] as $k=>$v) {
+					$default = $v->getAttribute('default');
+					if (!empty($default)) {
+						if (empty($defaults[$v->getAttribute('name')])) {
+							$defaults[$v->getAttribute('name')] = $default;
+						}
+					}
+				}
 			}
-			$this_field_name = (string) $this->name;
+			$this_field_name = $this->getAttribute('name');
 if($debug) dumpMessage($this_field_name);
 			if (!isset($count[$this_field_name])) {
 				$count[$this_field_name] = 0;
@@ -107,13 +116,29 @@ if($debug) dumpMessage($this_field_name);
 			$index = $count[$this_field_name];
 			$source_parameters = explode(',',(string)$this->element['source_parameter']);
 			$target_parameters = explode(',',(string)$this->element['target_parameter']);
+//if($debug) dump ($this_field_name,'$this_field_name');
 if($debug) dump ((string)$this->element['target_parameter'],(string)$this->element['source_parameter']);
 			$get_joomla_content_type_by_id = (string)$this->element['get_joomla_content_type_by_id'];
-if($debug) dump ($get_joomla_content_type_by_id,'$get_joomla_content_type_by_id');
+//if($debug) dump ($get_joomla_content_type_by_id,'$get_joomla_content_type_by_id');
 			foreach($source_parameters as $k=>$source_parameter) {
-if($debug) dump ($source_parameter,'$source_parameter');
-				$values = $from_params[$source_parameter];
-if($debug) dump ($values,'$values');
+				$values = array();
+//~ if($debug) dump ($source_parameter,'$source_parameter');
+//~ if($debug) dump ($count[$this_field_name],'$count[$this_field_name]');
+if($debug) dump ($index,'$index');
+
+				if (!isset($from_params[$source_parameter])) {
+					for ($i = 0; $i <$index+1 ; $i++) {
+						if ($i == $index) {
+							$values[] = $defaults[$source_parameter];
+						} else {
+							$values [] = null;
+						}
+					}
+if($debug) dump ($values,'$values 1');
+				} else {
+					$values = $from_params[$source_parameter];
+if($debug) dump ($values,'$values 2');
+				}
 				if (is_array($values[$index])) {
 					$this->element[$target_parameters[$k]] = implode(',',$values[$index]);
 				}

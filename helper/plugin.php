@@ -124,6 +124,8 @@ class JPluginGJFields extends JPlugin {
 			$defaults[$field_name] = '';
 			if (!empty((string)$f['default'])) {
 				$defaults[$field_name] = (string)$f['default'];
+			} else if ((string)$f['default'] == 0)	{
+				$defaults[$field_name] = (string)$f['default'];
 			}
 			if ($field_name == $group_name_end)  { break; }
 		}

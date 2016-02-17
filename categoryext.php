@@ -131,7 +131,7 @@ class JFormFieldCategoryext extends JFormFieldCategory
 		}
 		else
 		{
-			JLog::add(JText::_('JLIB_FORM_ERROR_FIELDS_CATEGORY_ERROR_EXTENSION_EMPTY'), JLog::WARNING, 'jerror');
+			JLog::add('NAS: '.$this->getAttribute('name').' '. JText::_('JLIB_FORM_ERROR_FIELDS_CATEGORY_ERROR_EXTENSION_EMPTY'), JLog::WARNING, 'jerror');
 		}
 
 		// Merge any additional options in the XML definition.
