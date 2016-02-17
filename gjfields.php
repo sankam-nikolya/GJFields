@@ -16,8 +16,11 @@ class JFormFieldGJFields extends JFormField {
 	function __construct($form = null) {
 		parent::__construct($form);
 		JHTML::_('behavior.framework', true);
-		if (!isset($GLOBALS[$this->type.'_initialized'])) {
-			$GLOBALS[$this->type.'_initialized'] = true;
+		$app = JFactory::getApplication();
+		if (!$app->get($this->type.'_initialized',false)) {
+			$app->set($this->type.'_initialized',true);
+
+
 			$url_to_assets = '/libraries/gjfields/';
 			$path_to_assets = JPATH_ROOT.'/libraries/gjfields/';
 			$doc = JFactory::getDocument();

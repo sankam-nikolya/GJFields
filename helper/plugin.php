@@ -33,7 +33,6 @@ class JPluginGJFields extends JPlugin {
 
 	}
 
-
 	/**
 	 * Determines if the current plugin has been just saved or applied and stores result into $this->pluginHasBeenSavedOrApplied
 	 *
@@ -103,6 +102,33 @@ class JPluginGJFields extends JPlugin {
 		else {
 			return;
 		}
+
+		// Get defauls values from XML {
+		$group_name_start = $group_name;
+		$group_name_end = str_replace('{','',$group_name).'}';
+		$xmlfile = $this->plg_path.'/'.$this->plg_name.'.xml';
+		$xml = simplexml_load_file($xmlfile);
+		//unset ($xml->scriptfile);
+		$field = 'field';
+		$xpath = 'config/fields/fieldset';
+
+		$started = false;
+		$defaults = array();
+		foreach ($xml->xpath('//'.$xpath.'/'.$field) as $f) {
+			$field_name = (string)$f['name'];
+			if ($field_name == $group_name_start)  { $started = true; continue; }
+			if (!$started) { continue; }
+			if ($f['basetype'] == 'toggler') { continue; }
+			if ($f['basetype'] == 'blockquote') { continue; }
+			if ($f['basetype'] == 'note') { continue; }
+			$defaults[$field_name] = '';
+			if (!empty((string)$f['default'])) {
+				$defaults[$field_name] = (string)$f['default'];
+			}
+			if ($field_name == $group_name_end)  { break; }
+		}
+		// Get defauls values from XML }
+
 		// Get all parameters
 		$params = $this->params->toObject();
 		$pparams = array();
@@ -146,6 +172,17 @@ class JPluginGJFields extends JPlugin {
 				}
 			}
 		}
+		// Update params with default values if there are no stored in the DB. Usefull when adding a new XML field and a user don't resave settings {
+		foreach ($pparams as $param_key=>$param) {
+			foreach ($defaults as $k=>$v) {
+				if (!isset($param[$k])) {
+					$pparams[$param_key][$k] = $v;
+				}
+			}
+		}
+		// Update params with default values if there are no stored in the DB. Usefull when adding a new XML field and a user don't resave settings }
+
+
 		$this->pparams = $pparams;
 	}
 

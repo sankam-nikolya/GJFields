@@ -73,7 +73,6 @@ class JFormFieldTextareafixed extends JFormFieldGJFields	{
 		$position = $this->element['name'] == 'alias' ? ' data-placement="bottom" ' : '';
 
 		$description = ($this->translateDescription && !empty($this->description)) ? JText::_($this->description) : $this->description;
-
 		$displayData = array(
 				'text'        => $text,
 				'description' => $description,
@@ -83,12 +82,40 @@ class JFormFieldTextareafixed extends JFormFieldGJFields	{
 				'position'    => $position
 			);
 
-		return JLayoutHelper::render($this->renderLabelLayout, $displayData);
+			$text     = $displayData['text'];
+			$desc     = $displayData['description'];
+			$for      = $displayData['for'];
+			$req      = $displayData['required'];
+			$classes  = array_filter((array) $displayData['classes']);
+			$position = $displayData['position'];
+
+			$id = $for . '-lbl';
+			$title = '';
+
+			// If a description is specified, use it to build a tooltip.
+			if (!empty($desc))	{
+				JHtml::_('bootstrap.tooltip');
+				$classes[] = 'hasTooltip';
+				$title     = ' title="' . JHtml::tooltipText(null,$desc, 0) . '"';
+			}
+
+			// If required, there's a class for that.
+			if ($req)
+			{
+				$classes[] = 'required';
+			}
+
+			$return = '<label id="'	.$id.'" for="'	.$for	.'" class="'.implode(' ', $classes)	.'" '	.$title	.$position	.'>'	.$text;
+			if ($req) {
+				$return .='<span class="star">&#160;*</span>';
+			}
+			$return .= '</label>';
+			return $return;
 	}
 
 	function Addition ($fieldNameCore) {
-		$text = '';
-		if (isset($this->element[$fieldNameCore.'Addition']) && !empty($this->element[$fieldNameCore.'Addition'])) {
+		if (isset($this->element[$fieldNameCore.'Addition']) && !empty((string)$this->element[$fieldNameCore.'Addition'])) {
+			$text = '';
 			$addition = explode(';$',$this->element[$fieldNameCore.'Addition']);
 			if (!file_exists(JPATH_SITE.'/'.$addition[0])) {
 				JFactory::getApplication()->enqueueMessage(JText::_('LIB_GJFIELDS_LABELADDITION_FILE_DOES_NOT_EXISTS').' : '.$addition[0].'<br/>'.$this->element['label'].' : '.$this->element['name'], 'error');
@@ -108,8 +135,8 @@ class JFormFieldTextareafixed extends JFormFieldGJFields	{
 					}
 				}
 			}
+			return $text;
 		}
-		return $text;
 	}
 }
 

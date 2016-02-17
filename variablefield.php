@@ -85,6 +85,45 @@ class JFormFieldVariablefield extends JFormFieldGJFields
 
 	}
 	protected function getLabel() {
+$debug = true;
+$debug = false;
+		// Here I handle dependant load of categories
+		static $count = array();
+		static $from_params = null;
+
+		if (isset($this->element['source_parameter']) && isset($this->element['target_parameter'])) {
+			if (empty($from_params)) {
+				$key_in_params = (string)$GLOBALS['variablefield']['fields'][0]->element['name'];
+				$from_params = $GLOBALS['variablefield']['fields'][0]->form->getData()->toObject()->params->{$key_in_params};
+			}
+			$this_field_name = (string) $this->name;
+if($debug) dumpMessage($this_field_name);
+			if (!isset($count[$this_field_name])) {
+				$count[$this_field_name] = 0;
+			} else {
+				$count[$this_field_name]++;
+				$count[$this_field_name]++;
+			}
+			$index = $count[$this_field_name];
+			$source_parameters = explode(',',(string)$this->element['source_parameter']);
+			$target_parameters = explode(',',(string)$this->element['target_parameter']);
+if($debug) dump ((string)$this->element['target_parameter'],(string)$this->element['source_parameter']);
+			$get_joomla_content_type_by_id = (string)$this->element['get_joomla_content_type_by_id'];
+if($debug) dump ($get_joomla_content_type_by_id,'$get_joomla_content_type_by_id');
+			foreach($source_parameters as $k=>$source_parameter) {
+if($debug) dump ($source_parameter,'$source_parameter');
+				$values = $from_params[$source_parameter];
+if($debug) dump ($values,'$values');
+				if (is_array($values[$index])) {
+					$this->element[$target_parameters[$k]] = implode(',',$values[$index]);
+				}
+				else {
+if($debug) dump ($values[$index], ' ++ '.$target_parameters[$k]);
+					$this->element[$target_parameters[$k]] = $values[$index];
+				}
+			}
+		}
+
 		$basetype = isset($this->element['basetype']) ? $this->element['basetype'] : 'text';
 		$basetype = (string) $basetype;
 		if ($basetype == 'group' || !empty($GLOBALS['variablefield']['current_group'])) {//If start or end of group
@@ -172,11 +211,21 @@ class JFormFieldVariablefield extends JFormFieldGJFields
 							$output .= $field->getInputHelper().PHP_EOL;//This outputs the field several times, if it's a repeatable
 						}
 
-						//Let show the script, that the group has ended
-						$formfield = JFormHelper::loadFieldType('hidden');
-						$formfield->setup($field->element,'');
-						$formfield->value = 'variablefield::'.$current_group;
-						$output .= $formfield->getInput().PHP_EOL;
+						switch ((string)$field->element['basetype']) {
+							case 'blockquote':
+							case 'toggler':
+
+								break;
+							default :
+								//Let show the script, that the group has ended
+								$formfield = JFormHelper::loadFieldType('hidden');
+								$formfield->setup($field->element,'');
+								$formfield->value = 'variablefield::'.$current_group;
+								$output .= $formfield->getInput().PHP_EOL;
+								break;
+						}
+
+
 
 						if(!version_compare(JVERSION,'3.0','ge')) {
 							$output .= '</li>'.PHP_EOL.'<li>';
@@ -192,6 +241,8 @@ class JFormFieldVariablefield extends JFormFieldGJFields
 	}
 
 	protected function getInputHelper () {
+
+
 		switch ((string)$this->element['basetype']) {
 			case 'radio':
 			case 'checkbox':

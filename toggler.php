@@ -47,7 +47,7 @@ class JFormFieldToggler extends JFormFieldGJFields {
 
 
 
-			$doc =& JFactory::getDocument();
+			$doc = JFactory::getDocument();
 
 			$cssname = $path_to_assets.'css/'.$this->type.'.css';
 			$doc->addStyleSheet($cssname);
