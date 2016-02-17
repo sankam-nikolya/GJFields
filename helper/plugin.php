@@ -122,10 +122,11 @@ class JPluginGJFields extends JPlugin {
 			if ($f['basetype'] == 'blockquote') { continue; }
 			if ($f['basetype'] == 'note') { continue; }
 			$defaults[$field_name] = '';
-			if (!empty((string)$f['default'])) {
-				$defaults[$field_name] = (string)$f['default'];
-			} else if ((string)$f['default'] == 0)	{
-				$defaults[$field_name] = (string)$f['default'];
+			$def = (string)$f['default'];
+			if (!empty($def)) {
+				$defaults[$field_name] = $def;
+			} else if ($def == 0)	{
+				$defaults[$field_name] = $def;
 			}
 			if ($field_name == $group_name_end)  { break; }
 		}

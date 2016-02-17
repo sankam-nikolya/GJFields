@@ -114,7 +114,8 @@ class JFormFieldTextareafixed extends JFormFieldGJFields	{
 	}
 
 	function Addition ($fieldNameCore) {
-		if (isset($this->element[$fieldNameCore.'Addition']) && !empty((string)$this->element[$fieldNameCore.'Addition'])) {
+		$fName = (string)$this->element[$fieldNameCore.'Addition'];
+		if (!empty($fName)) {
 			$text = '';
 			$addition = explode(';$',$this->element[$fieldNameCore.'Addition']);
 			if (!file_exists(JPATH_SITE.'/'.$addition[0])) {

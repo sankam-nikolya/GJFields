@@ -93,24 +93,40 @@ $debug = false;
 		static $defaults = array();
 		//~ static $runNumber = 0;
 		//~ $runNumber++;
+		if (!$flag || !isset($this->origname)) {
+			$this->origname = (string)$this->fieldname;
+		}
+
+		if (!isset($defaults[$this->origname])) {
+			$default = $this->getAttribute('default');
+			if (!empty($default)) {
+				$defaults[$this->origname] = $default;
+			}
+		}
+//~ echo '<pre style="background:#efefef">'.PHP_EOL;
+//~ print_r($this->origname);
+//~ echo '</pre>'.PHP_EOL;
 
 		if (isset($this->element['source_parameter']) && isset($this->element['target_parameter']) && $flag) {
-			$this_field_name = $this->name;
+			//$this_field_name = $this->name;
+			$this_field_name = (string)$this->element['name'];
+			$this_field_name = $this->origname;
+//~ echo '<pre> $this_field_name ='.PHP_EOL;
+//~ print_r($this_field_name);
+//~ echo '</pre>'.PHP_EOL;
 if($debug) dumpMessage($this_field_name);
 if($debug) dumpTrace();
 			if (empty($from_params)) {
 				$key_in_params = (string)$GLOBALS['variablefield']['fields'][0]->element['name'];
 				$from_params = $GLOBALS['variablefield']['fields'][0]->form->getData()->toObject()->params->{$key_in_params};
+//~ echo '<pre>'.PHP_EOL;
+//~ print_r($from_params);
+//~ echo '</pre>'.PHP_EOL;
 if($debug) dump ($from_params,'$from_params');
-				foreach ($GLOBALS['variablefield']['fields'] as $k=>$v) {
-					$default = $v->getAttribute('default');
-					if (!empty($default)) {
-						if (empty($defaults[$v->getAttribute('name')])) {
-							$defaults[$v->getAttribute('name')] = $default;
-						}
-					}
-				}
 			}
+//~ echo '<pre style="background:red"> defaults = '.PHP_EOL;
+//~ print_r($defaults);
+//~ echo '</pre>'.PHP_EOL;
 if($debug) dump ($this,'$this');
 if($debug) dumpMessage($this_field_name);
 

@@ -56,7 +56,7 @@ class JFormFieldGJFields extends JFormField {
 		return ( isset( $this->element[$val] ) && (string) $this->element[$val] != '' ) ? (string) $this->element[$val] : $default;
 	}
 
-	function _getGJFieldsVersion () {
+	static function _getGJFieldsVersion () {
 		$gjfields_version = file_get_contents(dirname(__FILE__).'/gjfields.xml');
 		preg_match('~<version>(.*)</version>~Ui',$gjfields_version,$gjfields_version);
 		$gjfields_version = $gjfields_version[1];
