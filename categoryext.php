@@ -54,6 +54,7 @@ class JFormFieldCategoryext extends JFormFieldCategory
 			default :
 				$category = JTable::getInstance( 'contenttype' );
 				$category->load( $extension );
+//~ dump ($category,'$category');
 				$extension = $category->type_alias;
 				break;
 		}
@@ -69,25 +70,39 @@ class JFormFieldCategoryext extends JFormFieldCategory
 		{
 			switch ($extension) {
 				case 'com_k2':
-						// Get the database object.
-						$db = JFactory::getDbo();
 
-						$query = $db->getQuery(true);
-						$query->select('id');
-						$query->select('name');
-						$query->from('#__k2_categories');
-						if ($published) {
-							$query->where($db->quoteName('published') .' = '. $db->Quote('1'));
+					$db = JFactory::getDBO();
+
+					$query = 'SELECT m.* FROM #__k2_categories m WHERE trash = 0 ORDER BY parent, ordering';
+					$db->setQuery($query);
+					$mitems = $db->loadObjectList();
+					$children = array();
+					if ($mitems) 					{
+						foreach ($mitems as $v)						{
+							 if (K2_JVERSION != '15')
+							 {
+								  $v->title = $v->name;
+								  $v->parent_id = $v->parent;
+							 }
+							 $pt = $v->parent;
+							 $list = @$children[$pt] ? $children[$pt] : array();
+							 array_push($list, $v);
+							 $children[$pt] = $list;
 						}
-						// Set the query and get the result list.
-						$db->setQuery((string)$query);
-						$items = $db->loadObjectlist();
-						// Build the field options.
-						if (!empty($items))	{
-							foreach ($items as $item)	{
-									$options[] = JHtml::_('select.option', $item->id, $item->name);
-							}
-						}
+					}
+					$list = JHTML::_('menu.treerecurse', 0, '', array(), $children, 9999, 0, 0);
+					$mitems = array();
+					foreach ($list as $item)	{
+						$item->treename = JString::str_ireplace('&#160;', ' -', $item->treename);
+						$mitems[] = JHTML::_('select.option', $item->id, $item->treename);
+					}
+					$options = $mitems;
+					break;
+				case 'com_jdownloads':
+					JLoader::register('JFormFieldjdCategorySelect', JPATH_ADMINISTRATOR.'/components/'.$extension.'/models/fields/jdcategoryselect.php');
+					$formfield = JFormHelper::loadFieldType('jdcategoryselect');
+					$formfield->setup($this->element,'');
+					$options = $formfield->getOptions();
 					break;
 				default :
 
