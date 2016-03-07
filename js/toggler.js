@@ -61,7 +61,8 @@ if (typeof( window['gjToggler'] ) == "undefined") {
 			else {
 				var switchElementName ='jform[params]['+toBeToggled.SwitchName+']';
 				//var startFromElement = gjScripts.getParentByTagName(toBeToggled,'div.tab-pane');
-				var startFromElement = toBeToggled.getParent('div.tab-pane');
+				//~ var startFromElement = toBeToggled.getParent('div.tab-pane');
+				var startFromElement = toBeToggled.closest('div.tab-pane, fieldset.panelform');
 				var switchers = startFromElement.getElements('select');//Radio and Checkboxes cannot be duplicated, only Select
 				for (l = 0; l < switchers.length; l++) {
 					if (switchers[l].name == switchElementName || switchers[l].name == switchElementName+'[]') {//Normal field or a variable one
@@ -104,7 +105,7 @@ if (typeof( window['gjToggler'] ) == "undefined") {
 				return;
 			}
 
-			if (JVERSION>='3.0') {//J3+
+			if (JVERSION>='3.0' && gjfields_HTMLtype == 'div') {//J3+ and isis
 				jQuery(switcher).chosen().change(switchFunction);
 			}
 			else {//2.5

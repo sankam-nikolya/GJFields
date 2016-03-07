@@ -52,6 +52,7 @@ class JFormFieldVariablefield extends JFormFieldGJFields
 		$language = JFactory::getLanguage();
 		$language->load('lib_gjfields', __DIR__, 'en-GB', true);
 		$language->load('lib_gjfields', __DIR__, $this->default_lang, true);
+
 	}
 
 	protected function prepareGroupField () {
@@ -99,10 +100,11 @@ $debug = false;
 
 		if (!isset($defaults[$this->origname])) {
 			$default = $this->getAttribute('default');
-			if (!empty($default)) {
+			if (trim($default) != '') {
 				$defaults[$this->origname] = $default;
 			}
 		}
+		$this->defaults = $defaults;
 //~ echo '<pre style="background:#efefef">'.PHP_EOL;
 //~ print_r($this->origname);
 //~ echo '</pre>'.PHP_EOL;
@@ -249,14 +251,14 @@ if($debug) dumpMessage (' Setting <b>'.$target_parameters[$k] . '</b> to  <b>'. 
 
 						$field->value = isset($current_values[$i][(string)$field->fieldname])?$current_values[$i][(string)$field->fieldname]:$field->defaultvalue;
 
-						if(version_compare(JVERSION,'3.0','ge')) {
+						if(version_compare(JVERSION,'3.0','ge') && $this->HTMLtype == 'div' ) {
 							$output .= PHP_EOL.'<div class="control-group">'.PHP_EOL;
 							$output .= PHP_EOL.'<div class="control-label">'.PHP_EOL.$field->getLabel(true).PHP_EOL.'</div><!-- control-label of a variable field -->'.PHP_EOL;
 							$output .= PHP_EOL.'<div class="controls">'.PHP_EOL.$field->getInputHelper().PHP_EOL.'</div><!-- controls of a variable field -->'.PHP_EOL;
 							$output .= PHP_EOL.'</div><!-- control-group -->';
 						}
 						else {
-							$output .= $field->getLabel().PHP_EOL;
+							$output .= $field->getLabel(true).PHP_EOL;
 							$output .= $field->getInputHelper().PHP_EOL;//This outputs the field several times, if it's a repeatable
 						}
 
@@ -276,7 +278,7 @@ if($debug) dumpMessage (' Setting <b>'.$target_parameters[$k] . '</b> to  <b>'. 
 
 
 
-						if(!version_compare(JVERSION,'3.0','ge')) {
+						if(!version_compare(JVERSION,'3.0','ge')  && $this->HTMLtype == 'li' ) {
 							$output .= '</li>'.PHP_EOL.'<li>';
 						}
 						break;
@@ -317,18 +319,19 @@ if($debug) dumpMessage (' Setting <b>'.$target_parameters[$k] . '</b> to  <b>'. 
 
 		$output = '';
 		if ($maxRepeatLength==1) {
-			if(version_compare(JVERSION,'3.0','ge')) {
-				$formfield->id = $formfield->id.uniqid();
-			}
+			$formfield->id = $formfield->id.uniqid();
 			$formfield->value = isset($originalValue[0])? $originalValue[0]:'';
-
-			$output .= $formfield->getInput().PHP_EOL;
+			//;
+			if (isset($this->defaults[$this->origname])) {
+				$out = str_replace('id="','data-default="'.$this->defaults[$this->origname].'" id="', $formfield->getInput());
+				$output .= $out;
+			} else {
+				$output .= $formfield->getInput().PHP_EOL;
+			}
 		}
 		else {
 			$output = '<div class="variablefield_div repeating_block" >'.PHP_EOL;
-			if(version_compare(JVERSION,'3.0','ge')) {
-				$formfield->id = $formfield->id.uniqid();
-			}
+			$formfield->id = $formfield->id.uniqid();
 			for($i=0; $i<$length; $i++) {
 				$output .=  $this->blockElementStartHTML();
 
@@ -340,7 +343,7 @@ if($debug) dumpMessage (' Setting <b>'.$target_parameters[$k] . '</b> to  <b>'. 
 			}
 			$output .= PHP_EOL.'</div><!-- repeatable field (many cloned fields) -->';
 		}
-		if(version_compare(JVERSION,'3.0','ge')) {
+		if(version_compare(JVERSION,'3.0','ge')  && $this->HTMLtype == 'div' ) {
 			return $output;
 			return PHP_EOL.'<div class="controls">'.PHP_EOL.$output.PHP_EOL.'</div>'.PHP_EOL.'</div>'.PHP_EOL;
 		}
@@ -351,39 +354,40 @@ if($debug) dumpMessage (' Setting <b>'.$target_parameters[$k] . '</b> to  <b>'. 
 
 	function groupStartHTML($ruleUniqID='') {
 		$output = '';
-		if(version_compare(JVERSION,'3.0','ge')) {
+		if(version_compare(JVERSION,'3.0','ge')  && $this->HTMLtype == 'div'  ) {
 			$output .=  '</div><!-- controls OR my empty div !-->'.$this->blockElementStartHTML(true,$ruleUniqID);
 			$output .= PHP_EOL.'<div class="sliderContainer">'.PHP_EOL;
 
-			//Let show the script, that the group has ended
-			$formfield = JFormHelper::loadFieldType('text');
-			$formfield->setup($this->element,'');
-			$formfield->id = '';
-			$formfield->readonly = 'readonly';
-			$formfield->class = 'ruleUniqID';
-			$formfield->name = 'jform[params]['.$this->fieldname.'][__ruleUniqID][]';// Remake field name to use group name
-			$formfield->value = !empty($ruleUniqID)?$ruleUniqID:'';
-			$output.= '<span class="ruleUniqID">UniqID: '.$formfield->getInput().'</span>'.PHP_EOL;
-
-			//Let show the script, that the group has ended
-			$formfield = JFormHelper::loadFieldType('hidden');
-			$formfield->setup($this->element,'');
-			$formfield->id = '';
-			$formfield->name = 'jform[params]['.$this->fieldname.'][__ruleUniqID][]';// Remake field name to use group name
-			$formfield->value = 'variablefield::'.$this->fieldname;
-			$output.= $formfield->getInput().PHP_EOL;
 		}
 		else {
 			$output .= PHP_EOL.'</li></ul>'.PHP_EOL;
 			$output .=  $this->blockElementStartHTML(true,$ruleUniqID);
 			$output .= PHP_EOL.'<div class="sliderContainer"><ul class="adminformlist"><li>'.PHP_EOL;
 		}
+		//Let show the script, that the group has ended
+		$formfield = JFormHelper::loadFieldType('text');
+		$formfield->setup($this->element,'');
+		$formfield->id = '';
+		$formfield->readonly = 'readonly';
+		$formfield->class = 'ruleUniqID';
+		$formfield->name = 'jform[params]['.$this->fieldname.'][__ruleUniqID][]';// Remake field name to use group name
+		$formfield->value = !empty($ruleUniqID)?$ruleUniqID:'';
+		$output.= '<span class="ruleUniqID">UniqID: '.$formfield->getInput().'</span>'.PHP_EOL;
+
+		//Let show the script, that the group has ended
+		$formfield = JFormHelper::loadFieldType('hidden');
+		$formfield->setup($this->element,'');
+		$formfield->id = '';
+		$formfield->class = 'ruleUniqID';
+		$formfield->name = 'jform[params]['.$this->fieldname.'][__ruleUniqID][]';// Remake field name to use group name
+		$formfield->value = 'variablefield::'.$this->fieldname;
+		$output.= $formfield->getInput().PHP_EOL;
 		return $output;
 	}
 
 	function groupEndHTML() {
 		$output = '';
-		if(version_compare(JVERSION,'3.0','ge')) {
+		if(version_compare(JVERSION,'3.0','ge')  && $this->HTMLtype == 'div'  ) {
 			$output .= PHP_EOL.'<span class="cleaner"></span></div><!-- sliderContainer --><span class="cleaner"></span>'.$this->blockElementEndHTML(true).'<div>';
 		}
 		else {
@@ -400,10 +404,11 @@ if($debug) dumpMessage (' Setting <b>'.$target_parameters[$k] . '</b> to  <b>'. 
 
 		$buttons = '';
 		if ($maxRepeatLength !== 1) {
-			$buttons .= '<a href="#" onclick="javascript:gjVariablefield.delete_current_slide(this); return(false);" class="variablefield_buttons delete_current_slide" >-</a>';
-			$buttons .= '<a href="#" onclick="javascript:gjVariablefield.add_new_slide(this, '.$maxRepeatLength.'); return(false);" class="variablefield_buttons add_new_slide" >+</a>';
-			$buttons .= '<a href="#" onclick="javascript:gjVariablefield.move_up_slide(this); return(false);" class="variablefield_buttons move_up_slide"  >&#8657;</a>';
-			$buttons .= '<a href="#" onclick="javascript:gjVariablefield.move_down_slide(this); return(false);" class="variablefield_buttons move_down_slide" >&#8659;</a>';
+			$buttons .= '<a class="variablefield_buttons reset_current_slide hasTip" title="'.JText::_('JSEARCH_RESET').'">--</a> ';
+			$buttons .= '<a class="variablefield_buttons move_up_slide hasTip" title="'.JText::_('JLIB_HTML_MOVE_UP').'">&#8657;</a>';
+			$buttons .= '<a class="variablefield_buttons move_down_slide hasTip" title="'.JText::_('JLIB_HTML_MOVE_DOWN').'">&#8659;</a>';
+			$buttons .= '<a data-max-repeat-length="'.$maxRepeatLength.'" class="variablefield_buttons add_new_slide hasTip" title="'.JText::_('JTOOLBAR_DUPLICATE').'" >+</a>';
+			$buttons .= '<a class="variablefield_buttons delete_current_slide hasTip" title="'.JText::_('JTOOLBAR_REMOVE').'">-</a>';
 		}
 
 		if ($isGroup) {
@@ -429,8 +434,8 @@ if($debug) dumpMessage (' Setting <b>'.$target_parameters[$k] . '</b> to  <b>'. 
 			$formfield->element['label']  = '';
 
 			// Prepare buttons
-			$editbutton  = '<a href="#" onclick="javascript:gjVariablefield.editGroupName(this); return(false);" class="hasTip editGroupName editGroupNameButton" title="'.JText::_('JACTION_EDIT').'::">✍</a>';
-			$editbutton .= '<a href="#" onclick="javascript:gjVariablefield.cancelGroupNameEdit(this); return(false);" class="hasTip cancelGroupNameEdit editGroupNameButton hide " title="'.JText::_('JCANCEL').'::">✕</a>';
+			$editbutton  = '<a class="hasTip editGroupName editGroupNameButton" title="'.JText::_('JACTION_EDIT').'::">✍</a>';
+			$editbutton .= '<a class="hasTip cancelGroupNameEdit editGroupNameButton hide " title="'.JText::_('JCANCEL').'::">✕</a>';
 			$output .=  $formfield->getLabel().$editbutton.'<span style="float:right;">'.$buttons.'</span>';
 			//$formfield->getLabel();
 			//$output .=  $editbutton.$buttons;
@@ -450,7 +455,7 @@ if($debug) dumpMessage (' Setting <b>'.$target_parameters[$k] . '</b> to  <b>'. 
 
 
 			JHTML::_('behavior.tooltip');
-			$output .= '<span class="hdr-wrppr hasTip" title="'.JText::_('LIB_VARIABLEFILED_GROUPNAME_TIP').'">'.$formfield->getInput().'</span>'.PHP_EOL;
+			$output .= '<span class="hdr-wrppr inactive hasTip" title="'.JText::_('LIB_VARIABLEFILED_GROUPNAME_TIP').'">'.$formfield->getInput().'</span>'.PHP_EOL;
 			$output .= '</div><!-- buttons_container -->' ;
 
 			//Field to store group status - opened or closed
@@ -483,7 +488,7 @@ if($debug) dumpMessage (' Setting <b>'.$target_parameters[$k] . '</b> to  <b>'. 
 	}
 	function blockElementEndHTML() {
 		$output = '';
-		if(version_compare(JVERSION,'3.0','ge')) {
+		if(version_compare(JVERSION,'3.0','ge')  && $this->HTMLtype == 'div'  ) {
 			$output .= PHP_EOL.'</div><!-- variablefield_div repeating_group -->'.PHP_EOL;
 		}
 		else {

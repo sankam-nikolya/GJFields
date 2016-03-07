@@ -28,7 +28,12 @@ textarea.textarea {
 	background-color:#ffffff;
 	width:8px;
 	text-decoration:none;
-	float:right;
+	float:left;
+	cursor:pointer;
+}
+.reset_current_slide {
+	background:orange;
+	margin-right: 10px;
 }
 .delete_current_slide {
 	margin-right:5px;
@@ -98,9 +103,21 @@ span.hdr-wrppr {
 	padding-left: 6px;
 	padding-right: 20px;
 }
-.groupnameEditField {
+span.hdr-wrppr.inactive input.groupnameEditField,
+span.hdr-wrppr.inactive input.groupnameEditField:active,
+span.hdr-wrppr.inactive input.groupnameEditField:focus {
+	width:100%;
+	background:transparent;
+	border:none;
+	cursor: pointer;
+	box-shadow:none;
+}
+span.hdr-wrppr input.groupnameEditField,
+span.hdr-wrppr input.groupnameEditField:active,
+span.hdr-wrppr input.groupnameEditField:focus {
 	width:100%;
 }
+
 .form-horizontal .repeating_group div.control-group .control-group {
 	margin-bottom:0;
 }
@@ -119,12 +136,12 @@ input[readonly="readonly"],input:focus[readonly="readonly"],input.readonlyGroupN
     background:silver;
     color:#000;
 }
-.control-group span.ruleUniqID, .control-group span.ruleUniqID input {
+.control-group span.ruleUniqID, .control-group span.ruleUniqID input, .ruleUniqID {
 	padding:0;
 	margin:0;
 	border:0px solid;
 	font-size:9px;
-	float:right;
+	float:right !important;
 	background:transparent;
 	text-align:right;
    color:brown;

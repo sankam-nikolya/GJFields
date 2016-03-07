@@ -72,10 +72,13 @@ class JFormFieldToggler extends JFormFieldGJFields {
 		$casesensitive = $this->def( 'casesensitive' );
 		$class = $this->def( 'class' );
 
+		if (!empty($this->element['clean_name'])) { $comment = $this->element['clean_name']; }
+		else { $comment = $this->element['name']; }
+
 		$param = preg_replace( '#^\s*(.*?)\s*$#', '\1', $param );
 		$param = preg_replace( '#\s*\|\s*#', '|', $param );
 
-		$html = PHP_EOL;
+		$html = '';
 		if ( $param != '' ) {
 			$param = preg_replace( '#[^a-z0-9-\.\|\@]#', '_', $param );
 			$set_groups = explode( '|', $param );
@@ -117,21 +120,26 @@ class JFormFieldToggler extends JFormFieldGJFields {
 			if (!empty($this->element['label'])) {
 				$html .= '<div class="title">'.JText::_($this->element['label']).'</div>';
 			}
-			if(version_compare(JVERSION,'3.0','ge')) {
+			if(version_compare(JVERSION,'3.0','ge') && $this->HTMLtype == 'div') {
 				$html = '</div>'.PHP_EOL.'<!-- controls !-->'.PHP_EOL.$html.PHP_EOL.'<div><div>';
 			}
 			else {
-				$html .= '<ul><li>'.PHP_EOL;
+				//$html = '</div>'.PHP_EOL.'<!-- controls !-->'.PHP_EOL.$html.PHP_EOL.'<div><div>';
+				$html = '</li></ul>'.'<!-- close core '.$comment.' -->'.
+					PHP_EOL.'									'.
+					$html.
+					PHP_EOL.'		'.'<ul><li><!-- continue core flow '.$comment.' -->'.PHP_EOL;
 			}
 		} else {
-			if(version_compare(JVERSION,'3.0','ge')) {
+			if(version_compare(JVERSION,'3.0','ge') && $this->HTMLtype == 'div') {
 				$html .= '</div><!-- controls !-->'.PHP_EOL;
 				$html .= '</div><!-- control-group !-->'.PHP_EOL;
 			}
 			else {
-				$html .= "\n".'</li></ul>';
+				$html .= "\n".'</li></ul></div><ul><li><!-- '.$comment.' -->';
+				//$html .= "\n".'<!-- start --></li></ul><!-- end -->';
 			}
-			$html .= '<div style="clear: both;"></div>'.PHP_EOL;
+			//$html .= '<div style="clear: both;"></div>'.PHP_EOL;
 		}
 
 		return $html;

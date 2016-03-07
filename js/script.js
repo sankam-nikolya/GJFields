@@ -1,3 +1,12 @@
+jQuery( document ).ready(function($) { // Clean empty li elements, mostly for hathor backend template
+	$('ul li:not([class],[id]), ul:not([class],[id]), div:not([class],[id]) ').filter(function() {
+		return $(this).text().trim() == '';
+	}).remove();
+});
+
+
+
+
 // JavaScript Document
 if (typeof( window['gjScripts'] ) == "undefined") {
 	var scripts= document.getElementsByTagName('script');

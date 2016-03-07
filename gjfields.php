@@ -48,6 +48,19 @@ class JFormFieldGJFields extends JFormField {
 				$doc->addScript($scriptname);
 			}
 		}
+
+		$this->HTMLtype = 'div';
+		if (JFactory::getApplication()->isAdmin() && JFactory::getApplication()->getTemplate() !== 'isis') {
+			$this->HTMLtype = 'li';
+		}
+		$var_name = basename(__FILE__,'.php').'_HTMLtype';
+		if (!$app->get($var_name,false)) {
+			$app->set($var_name,true);
+			$doc = JFactory::getDocument();
+			$doc->addScriptDeclaration('var '.$var_name.' = "'.$this->HTMLtype.'";');
+			$doc->addScriptDeclaration('var lang_reset = "'.JText::_('JSEARCH_RESET').'?";');
+		}
+
 	}
 
 	function getInput() {
