@@ -1,5 +1,6 @@
 jQuery( document ).ready(function($) {
 	$('div.variablefield_div input.groupState[value=0]').parent().find('div.sliderContainer').hide();
+	$('div.variablefield_div input.groupState[value=0]').parent().find('a.reset_current_slide').hide();
 	$('.groupSlider, span.hdr-wrppr ').click(function() {
 		element = $(this);
 		if (!element.hasClass('inactive')) { return; }
@@ -7,9 +8,12 @@ jQuery( document ).ready(function($) {
 		$( slidePanelElement).toggle( "slow", function() {
 			// Animation complete.
 			var groupState = $($(this).parent().find('.groupState')[0]);
+			var resetButton = $($(this).parent().find('a.reset_current_slide')[0]);
 			if ($(this).is(":hidden")) {
+				resetButton.hide();
 				groupState.val(0);
 			} else {
+				resetButton.show();
 				groupState.val(1);
 			}
 		});
@@ -122,6 +126,7 @@ jQuery( document ).ready(function($) {
 			var default_value = $( this ).attr( "data-default" );
 			if (default_value) {
 				field.val(default_value);
+				field.trigger("change");
 				field.trigger("chosen:updated");
 				field.trigger("liszt:updated"); // At least with Joomla 3.4.8 it needs this trigger
 			}

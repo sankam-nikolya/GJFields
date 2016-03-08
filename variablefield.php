@@ -323,7 +323,7 @@ if($debug) dumpMessage (' Setting <b>'.$target_parameters[$k] . '</b> to  <b>'. 
 			$formfield->value = isset($originalValue[0])? $originalValue[0]:'';
 			//;
 			if (isset($this->defaults[$this->origname])) {
-				$out = str_replace('id="','data-default="'.$this->defaults[$this->origname].'" id="', $formfield->getInput());
+				$out = str_replace('id="','data-default="'.htmlspecialchars(JText::_($this->defaults[$this->origname])).'" id="', $formfield->getInput());
 				$output .= $out;
 			} else {
 				$output .= $formfield->getInput().PHP_EOL;
