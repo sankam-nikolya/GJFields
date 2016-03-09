@@ -78,7 +78,16 @@ jQuery( document ).ready(function($) {
 				return;
 			}
 		}
+
+
+		currPanel.find( 'select' ).each(function() {	$(this).chosen("destroy");	});
 		var newPanel = currPanel.clone(true);
+		currPanel.find( 'select' ).each(function() {	$(this).chosen({disable_search_threshold: 10});	});
+		newPanel.find( 'select' ).each(function() {	$(this).chosen({disable_search_threshold: 10});	});
+		newPanel.find( '.gjtoggler' ).each(function() {
+			gjToggler.connectWithSwitch(this);
+		});
+
 
 		jQuery(newPanel).find('input.ruleUniqID')[0].value = uniqid(); // Make uniqId for a group
 		// Add smth. like (2) to the name of the group when copying
@@ -97,6 +106,7 @@ jQuery( document ).ready(function($) {
 		jQuery(newPanel).find('.groupnameEditField')[0].value = jQuery(newPanel).find('.groupnameEditField')[0].value + ' ('+i+')';
 
 		newPanel.insertAfter(currPanel);
+
 
 	});
 	$('a.move_up_slide').click(function(e) {
