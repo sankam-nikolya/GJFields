@@ -272,6 +272,9 @@ if($debug) dumpMessage (' Setting <b>'.$target_parameters[$k] . '</b> to  <b>'. 
 						switch ((string)$field->element['basetype']) {
 							case 'blockquote':
 							case 'toggler':
+							case 'note':
+							case 'notefixed':
+							case 'spacer':
 
 								break;
 							default :
