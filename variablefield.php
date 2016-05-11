@@ -325,6 +325,12 @@ if($debug) dumpMessage (' Setting <b>'.$target_parameters[$k] . '</b> to  <b>'. 
 		$formfield = JFormHelper::loadFieldType($basetype);
 		$this->element['clean_name'] = (string)$this->element['name'];
 		$this->element['name'] = $this->name.'[]';
+		if(isset($this->element->option)) {
+			foreach ($this->element->option as $Item) {
+				$Item[0] = $this->_replaceNestedJtextConstants ($Item[0]);
+
+			}
+		}
 		$formfield->setup($this->element,'');
 
 		$output = '';
