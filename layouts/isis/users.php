@@ -124,7 +124,7 @@ JHtml::script(Juri::root() .'/libraries/gjfields/js/fieldusers.js', false, true,
 				array(
 					'title'  => JText::_('JLIB_FORM_CHANGE_USER'),
 					'closeButton' => true,
-					'footer' => '<button class="btn" data-dismiss="modal">' . JText::_('JCANCEL') . '</button>'
+					'footer' => '<button class="btn" data-dismiss="modal">' . JText::_('JLIB_HTML_BEHAVIOR_CLOSE') . '</button>'
 				)
 			); ?>
 		<?php endif; ?>
